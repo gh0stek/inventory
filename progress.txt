@@ -375,3 +375,43 @@
 
 **Next Steps:**
 - Documentation: README with decisions and trade-offs (Task 12)
+
+---
+
+### 2026-01-25: Documentation Implementation
+
+**Task Completed:** Documentation - README with decisions and trade-offs (Task 12)
+
+**Files Created:**
+- `README.md` - Comprehensive project documentation
+
+**Documentation Includes:**
+- Quick start guide with Docker Compose
+- Technology stack overview with versions
+- Project structure diagram
+- Complete API endpoint reference
+- Product filtering query parameters
+- Local development instructions
+- Testing instructions
+- 8 detailed design decisions with trade-offs:
+  1. Drizzle ORM over Prisma/TypeORM
+  2. Zod for validation (frontend & backend)
+  3. Nested routes for products
+  4. Decimal type for prices
+  5. Cascade deletes
+  6. Client-side filtering state
+  7. Inline stock editing
+  8. No authentication (MVP scope)
+- Database schema documentation
+- Seed data description
+- Environment variables reference
+- Test coverage summary (38 tests)
+- Future improvements roadmap
+
+**Verification:**
+- TypeScript build passes successfully (server)
+- TypeScript build passes successfully (web)
+- Vite production build succeeds
+- All 38 Jest tests pass
+
+**Project Status:** ALL TASKS COMPLETE
