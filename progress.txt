@@ -200,3 +200,62 @@
 
 **Next Steps:**
 - Create frontend features: Store Detail page with filters, forms, product table (Task 9)
+
+---
+
+### 2026-01-25: Frontend Features Implementation
+
+**Task Completed:** Frontend Features - Store Detail page, filters, forms (Task 9)
+
+**Files Created:**
+- `web/src/hooks/useProducts.ts` - TanStack Query hooks for products (useProducts, useCreateProduct, useUpdateProduct, useUpdateProductStock, useDeleteProduct)
+- `web/src/components/products/ProductFilters.tsx` - Filter bar with search, category dropdown, price range, sort options, in-stock checkbox
+- `web/src/components/products/ProductTable.tsx` - Product listing table with inline stock editing, edit/delete actions
+- `web/src/components/products/ProductForm.tsx` - Modal form for creating/editing products with validation
+- `web/src/components/products/Pagination.tsx` - Pagination controls with page numbers and navigation
+- `web/src/components/products/DeleteConfirmation.tsx` - Confirmation modal for product deletion
+- `web/src/components/products/index.ts` - Product components barrel export
+
+**Files Modified:**
+- `web/src/types/index.ts` - Added ProductFilters, CreateProductData, UpdateProductData interfaces
+- `web/src/api/client.ts` - Added productsApi with all CRUD endpoints
+- `web/src/pages/StoreDetailPage.tsx` - Complete rewrite with product table, filters, forms integration
+
+**Features Implemented:**
+- Product API client with all endpoints:
+  - getByStore with filter parameters
+  - getById, create, update, updateStock, delete
+- TanStack Query hooks with cache invalidation for products and stats
+- Product table with:
+  - Columns: Product (name + description), Category, SKU, Price, Quantity, Status, Actions
+  - Inline stock quantity editing with save/cancel
+  - Stock status indicators (In Stock, Low Stock, Out of Stock)
+  - Edit and Delete action buttons
+  - Empty state message
+- Product filters with:
+  - Search input with 300ms debounce
+  - Category dropdown (populated from store stats)
+  - Min/Max price inputs
+  - Sort by (name, price, quantity, date) and order (asc, desc)
+  - In-stock only checkbox
+  - Clear filters button
+- Pagination with:
+  - Page number buttons with ellipsis for large page counts
+  - Previous/Next navigation
+  - "Showing X to Y of Z products" counter
+- Product form modal with:
+  - Name, Category, Price, Quantity fields (required)
+  - SKU, Description fields (optional)
+  - Client-side validation
+  - Create/Update modes
+  - Loading state during submission
+- Delete confirmation modal
+- All mutations invalidate relevant queries (products list, product detail, store stats)
+
+**Verification:**
+- TypeScript build passes successfully (web)
+- TypeScript build passes successfully (server)
+- Vite production build succeeds
+
+**Next Steps:**
+- Polish: Loading states, error handling, validation feedback (Task 10)

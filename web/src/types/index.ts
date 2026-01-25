@@ -48,6 +48,37 @@ export interface PaginatedResponse<T> {
   };
 }
 
+export interface ProductFilters {
+  page?: number;
+  limit?: number;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean;
+  lowStock?: number;
+  search?: string;
+  sortBy?: 'name' | 'price' | 'quantity' | 'createdAt';
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface CreateProductData {
+  name: string;
+  category: string;
+  price: number;
+  quantity: number;
+  sku?: string;
+  description?: string;
+}
+
+export interface UpdateProductData {
+  name?: string;
+  category?: string;
+  price?: number;
+  quantity?: number;
+  sku?: string;
+  description?: string;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
