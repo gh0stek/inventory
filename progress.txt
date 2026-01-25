@@ -259,3 +259,65 @@
 
 **Next Steps:**
 - Polish: Loading states, error handling, validation feedback (Task 10)
+
+---
+
+### 2026-01-25: Frontend Polish Implementation
+
+**Task Completed:** Polish - Loading states, error handling, validation feedback (Task 10)
+
+**Files Created:**
+- `web/src/components/common/Toast.tsx` - Toast notification component with success/error/info variants, auto-dismiss, and close button
+- `web/src/context/ToastContext.tsx` - Toast context provider with showToast, showSuccess, showError, showInfo methods
+- `web/src/utils/errors.ts` - Error utility functions (getErrorMessage, getValidationErrors) for extracting user-friendly messages from API errors
+- `web/src/components/products/ProductTableSkeleton.tsx` - Skeleton loader for product table rows with pulse animation
+
+**Files Modified:**
+- `web/src/App.tsx` - Added ToastProvider wrapper around the app
+- `web/src/components/common/index.ts` - Added Toast exports
+- `web/src/components/common/ErrorMessage.tsx` - Enhanced with retry button and icon
+- `web/src/components/products/index.ts` - Added ProductTableSkeleton export
+- `web/src/components/products/ProductTable.tsx` - Added loading state for stock updates, validation for inline editing, error feedback
+- `web/src/components/products/ProductForm.tsx` - Added serverErrors prop for displaying API validation errors
+- `web/src/pages/StoreDetailPage.tsx` - Comprehensive update with:
+  - Toast notifications for all mutations (create, update, delete, stock update)
+  - Error handling with user-friendly messages
+  - Server-side validation error display in forms
+  - Skeleton loaders for product table
+  - Stats skeleton loaders
+  - Retry functionality for failed API calls
+  - Loading indicators for inline stock editing
+
+**Features Implemented:**
+- Toast notification system:
+  - Success, error, and info notification types
+  - Auto-dismiss after 4 seconds with fade-out animation
+  - Manual close button
+  - Positioned at bottom-right of screen
+  - Stacking support for multiple toasts
+- Mutation error handling:
+  - All CRUD operations show toast on success/failure
+  - User-friendly error messages extracted from API responses
+  - Server validation errors displayed inline in forms
+- Loading states:
+  - Skeleton loader for product table while loading
+  - Skeleton loader for stats cards while loading
+  - Inline spinner for stock update operations
+  - Disabled state for form inputs during submission
+- Error recovery:
+  - Retry button on ErrorMessage component
+  - Refetch functions for store, stats, and products data
+  - Error states with clear user guidance
+- Form validation feedback:
+  - Client-side validation with error messages
+  - Server-side validation errors merged with client errors
+  - Visual feedback (red borders) on invalid fields
+  - SKU field validation for unique constraint errors
+
+**Verification:**
+- TypeScript build passes successfully (web)
+- TypeScript build passes successfully (server)
+- Vite production build succeeds
+
+**Next Steps:**
+- Docker & Tests: Finalize Dockerfiles, write Jest tests for backend (Task 11)

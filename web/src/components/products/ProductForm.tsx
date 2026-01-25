@@ -6,6 +6,7 @@ interface ProductFormProps {
   onSubmit: (data: CreateProductData) => void;
   onCancel: () => void;
   isLoading?: boolean;
+  serverErrors?: Record<string, string>;
 }
 
 export function ProductForm({
@@ -13,6 +14,7 @@ export function ProductForm({
   onSubmit,
   onCancel,
   isLoading,
+  serverErrors = {},
 }: ProductFormProps) {
   const [formData, setFormData] = useState<CreateProductData>({
     name: '',
@@ -24,6 +26,9 @@ export function ProductForm({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Merge client-side and server-side errors
+  const allErrors = { ...errors, ...serverErrors };
 
   useEffect(() => {
     if (product) {
@@ -107,12 +112,12 @@ export function ProductForm({
               value={formData.name}
               onChange={handleChange}
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.name ? 'border-red-500' : 'border-gray-300'
+                allErrors.name ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Product name"
             />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+            {allErrors.name && (
+              <p className="mt-1 text-sm text-red-600">{allErrors.name}</p>
             )}
           </div>
 
@@ -126,12 +131,12 @@ export function ProductForm({
               value={formData.category}
               onChange={handleChange}
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                errors.category ? 'border-red-500' : 'border-gray-300'
+                allErrors.category ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="Category"
             />
-            {errors.category && (
-              <p className="mt-1 text-sm text-red-600">{errors.category}</p>
+            {allErrors.category && (
+              <p className="mt-1 text-sm text-red-600">{allErrors.category}</p>
             )}
           </div>
 
@@ -148,12 +153,12 @@ export function ProductForm({
                 min="0"
                 step="0.01"
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.price ? 'border-red-500' : 'border-gray-300'
+                  allErrors.price ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="0.00"
               />
-              {errors.price && (
-                <p className="mt-1 text-sm text-red-600">{errors.price}</p>
+              {allErrors.price && (
+                <p className="mt-1 text-sm text-red-600">{allErrors.price}</p>
               )}
             </div>
 
@@ -168,12 +173,12 @@ export function ProductForm({
                 onChange={handleChange}
                 min="0"
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.quantity ? 'border-red-500' : 'border-gray-300'
+                  allErrors.quantity ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="0"
               />
-              {errors.quantity && (
-                <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
+              {allErrors.quantity && (
+                <p className="mt-1 text-sm text-red-600">{allErrors.quantity}</p>
               )}
             </div>
           </div>
@@ -187,9 +192,14 @@ export function ProductForm({
               name="sku"
               value={formData.sku}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                allErrors.sku ? 'border-red-500' : 'border-gray-300'
+              }`}
               placeholder="Optional SKU"
             />
+            {allErrors.sku && (
+              <p className="mt-1 text-sm text-red-600">{allErrors.sku}</p>
+            )}
           </div>
 
           <div>

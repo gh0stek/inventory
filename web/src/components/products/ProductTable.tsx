@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Product } from '../../types';
 
 interface ProductTableProps {
@@ -6,6 +6,8 @@ interface ProductTableProps {
   onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
   onStockUpdate: (product: Product, quantity: number) => void;
+  stockUpdatingId?: number;
+  stockUpdateError?: { id: number; message: string } | null;
 }
 
 export function ProductTable({
@@ -13,27 +15,45 @@ export function ProductTable({
   onEdit,
   onDelete,
   onStockUpdate,
+  stockUpdatingId,
+  stockUpdateError,
 }: ProductTableProps) {
   const [editingStockId, setEditingStockId] = useState<number | null>(null);
   const [stockValue, setStockValue] = useState<string>('');
+  const [localStockError, setLocalStockError] = useState<string | null>(null);
+
+  // Clear edit state when stock update succeeds
+  useEffect(() => {
+    if (!stockUpdatingId && editingStockId && !stockUpdateError) {
+      setEditingStockId(null);
+      setStockValue('');
+    }
+  }, [stockUpdatingId, editingStockId, stockUpdateError]);
 
   const handleStockEdit = (product: Product) => {
     setEditingStockId(product.id);
     setStockValue(String(product.quantity));
+    setLocalStockError(null);
   };
 
   const handleStockSave = (product: Product) => {
     const newQuantity = parseInt(stockValue, 10);
-    if (!isNaN(newQuantity) && newQuantity >= 0) {
-      onStockUpdate(product, newQuantity);
+    if (isNaN(newQuantity)) {
+      setLocalStockError('Please enter a valid number');
+      return;
     }
-    setEditingStockId(null);
-    setStockValue('');
+    if (newQuantity < 0) {
+      setLocalStockError('Quantity cannot be negative');
+      return;
+    }
+    setLocalStockError(null);
+    onStockUpdate(product, newQuantity);
   };
 
   const handleStockCancel = () => {
     setEditingStockId(null);
     setStockValue('');
+    setLocalStockError(null);
   };
 
   const getStockStatus = (quantity: number) => {
@@ -108,37 +128,56 @@ export function ProductTable({
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right">
                 {editingStockId === product.id ? (
-                  <div className="flex items-center justify-end gap-1">
-                    <input
-                      type="number"
-                      value={stockValue}
-                      onChange={(e) => setStockValue(e.target.value)}
-                      min="0"
-                      className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      autoFocus
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleStockSave(product);
-                        if (e.key === 'Escape') handleStockCancel();
-                      }}
-                    />
-                    <button
-                      onClick={() => handleStockSave(product)}
-                      className="text-green-600 hover:text-green-800 p-1"
-                      title="Save"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={handleStockCancel}
-                      className="text-gray-600 hover:text-gray-800 p-1"
-                      title="Cancel"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
+                  <div className="flex flex-col items-end gap-1">
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="number"
+                        value={stockValue}
+                        onChange={(e) => {
+                          setStockValue(e.target.value);
+                          setLocalStockError(null);
+                        }}
+                        min="0"
+                        disabled={stockUpdatingId === product.id}
+                        className={`w-20 px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                          localStockError || (stockUpdateError?.id === product.id)
+                            ? 'border-red-500'
+                            : 'border-gray-300'
+                        }`}
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleStockSave(product);
+                          if (e.key === 'Escape') handleStockCancel();
+                        }}
+                      />
+                      {stockUpdatingId === product.id ? (
+                        <div className="w-4 h-4 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => handleStockSave(product)}
+                            className="text-green-600 hover:text-green-800 p-1"
+                            title="Save"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={handleStockCancel}
+                            className="text-gray-600 hover:text-gray-800 p-1"
+                            title="Cancel"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </>
+                      )}
+                    </div>
+                    {localStockError && (
+                      <span className="text-xs text-red-600">{localStockError}</span>
+                    )}
                   </div>
                 ) : (
                   <button

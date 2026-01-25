@@ -12,24 +12,30 @@ import { LoadingSpinner, ErrorMessage } from '../components/common';
 import {
   ProductFilters,
   ProductTable,
+  ProductTableSkeleton,
   ProductForm,
   Pagination,
   DeleteConfirmation,
 } from '../components/products';
+import { useToast } from '../context/ToastContext';
+import { getErrorMessage, getValidationErrors } from '../utils/errors';
 import type { Product, ProductFilters as Filters, CreateProductData } from '../types';
 
 export function StoreDetailPage() {
   const { id } = useParams<{ id: string }>();
   const storeId = Number(id);
+  const { showSuccess, showError } = useToast();
 
   const [filters, setFilters] = useState<Filters>({ page: 1, limit: 20 });
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
+  const [formServerErrors, setFormServerErrors] = useState<Record<string, string>>({});
+  const [stockUpdateError, setStockUpdateError] = useState<{ id: number; message: string } | null>(null);
 
-  const { data: store, isLoading: isLoadingStore, error: storeError } = useStore(storeId);
-  const { data: stats, isLoading: isLoadingStats } = useStoreStats(storeId);
-  const { data: productsResponse, isLoading: isLoadingProducts } = useProducts(storeId, filters);
+  const { data: store, isLoading: isLoadingStore, error: storeError, refetch: refetchStore } = useStore(storeId);
+  const { data: stats, isLoading: isLoadingStats, error: statsError, refetch: refetchStats } = useStoreStats(storeId);
+  const { data: productsResponse, isLoading: isLoadingProducts, error: productsError, refetch: refetchProducts } = useProducts(storeId, filters);
 
   const createProduct = useCreateProduct(storeId);
   const updateProduct = useUpdateProduct(storeId);
@@ -64,10 +70,24 @@ export function StoreDetailPage() {
   };
 
   const handleStockUpdate = (product: Product, quantity: number) => {
-    updateStock.mutate({ id: product.id, quantity });
+    setStockUpdateError(null);
+    updateStock.mutate(
+      { id: product.id, quantity },
+      {
+        onSuccess: () => {
+          showSuccess('Stock updated successfully');
+        },
+        onError: (error) => {
+          const message = getErrorMessage(error);
+          setStockUpdateError({ id: product.id, message });
+          showError(message);
+        },
+      }
+    );
   };
 
   const handleFormSubmit = (data: CreateProductData) => {
+    setFormServerErrors({});
     if (editingProduct) {
       updateProduct.mutate(
         { id: editingProduct.id, data },
@@ -75,6 +95,14 @@ export function StoreDetailPage() {
           onSuccess: () => {
             setShowForm(false);
             setEditingProduct(null);
+            showSuccess('Product updated successfully');
+          },
+          onError: (error) => {
+            const validationErrors = getValidationErrors(error);
+            if (validationErrors) {
+              setFormServerErrors(validationErrors);
+            }
+            showError(getErrorMessage(error));
           },
         }
       );
@@ -82,6 +110,14 @@ export function StoreDetailPage() {
       createProduct.mutate(data, {
         onSuccess: () => {
           setShowForm(false);
+          showSuccess('Product created successfully');
+        },
+        onError: (error) => {
+          const validationErrors = getValidationErrors(error);
+          if (validationErrors) {
+            setFormServerErrors(validationErrors);
+          }
+          showError(getErrorMessage(error));
         },
       });
     }
@@ -90,6 +126,7 @@ export function StoreDetailPage() {
   const handleFormCancel = () => {
     setShowForm(false);
     setEditingProduct(null);
+    setFormServerErrors({});
   };
 
   const handleDeleteConfirm = () => {
@@ -97,6 +134,10 @@ export function StoreDetailPage() {
       deleteProduct.mutate(deletingProduct.id, {
         onSuccess: () => {
           setDeletingProduct(null);
+          showSuccess('Product deleted successfully');
+        },
+        onError: (error) => {
+          showError(getErrorMessage(error));
         },
       });
     }
@@ -117,7 +158,10 @@ export function StoreDetailPage() {
   if (storeError || !store) {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
-        <ErrorMessage message="Failed to load store. Please try again later." />
+        <ErrorMessage
+          message="Failed to load store. Please try again later."
+          onRetry={() => refetchStore()}
+        />
         <Link to="/stores" className="text-blue-600 hover:underline mt-4 inline-block">
           Back to stores
         </Link>
@@ -139,7 +183,21 @@ export function StoreDetailPage() {
         </div>
 
         {isLoadingStats ? (
-          <LoadingSpinner />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-white rounded-lg shadow border border-gray-200 p-4 animate-pulse">
+                <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded w-16"></div>
+              </div>
+            ))}
+          </div>
+        ) : statsError ? (
+          <div className="mb-8">
+            <ErrorMessage
+              message="Failed to load store statistics."
+              onRetry={() => refetchStats()}
+            />
+          </div>
         ) : stats ? (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
@@ -180,9 +238,12 @@ export function StoreDetailPage() {
             />
 
             {isLoadingProducts ? (
-              <div className="py-8 flex justify-center">
-                <LoadingSpinner />
-              </div>
+              <ProductTableSkeleton rows={5} />
+            ) : productsError ? (
+              <ErrorMessage
+                message="Failed to load products."
+                onRetry={() => refetchProducts()}
+              />
             ) : productsResponse ? (
               <>
                 <ProductTable
@@ -190,6 +251,8 @@ export function StoreDetailPage() {
                   onEdit={handleEditProduct}
                   onDelete={handleDeleteProduct}
                   onStockUpdate={handleStockUpdate}
+                  stockUpdatingId={updateStock.isPending ? updateStock.variables?.id : undefined}
+                  stockUpdateError={stockUpdateError}
                 />
                 <Pagination
                   page={productsResponse.meta.page}
@@ -210,6 +273,7 @@ export function StoreDetailPage() {
           onSubmit={handleFormSubmit}
           onCancel={handleFormCancel}
           isLoading={createProduct.isPending || updateProduct.isPending}
+          serverErrors={formServerErrors}
         />
       )}
 
