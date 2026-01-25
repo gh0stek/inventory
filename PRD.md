@@ -420,7 +420,7 @@ const result = await db
    - Test full user flow
 4. **Automated Tests**: `npm test` in both server/ and web/
 
-## Coomit Guidelines
+## Commit Guidelines
 
 - also include changes of PRD.md file and progress.txt file in every commit
 - use `[ROBOT]` prefix in commit messages
