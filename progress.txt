@@ -73,3 +73,40 @@
 
 **Next Steps:**
 - Create inventory module with aggregation stats (store stats endpoint)
+
+---
+
+### 2026-01-25: Inventory Module Implementation
+
+**Task Completed:** Backend Modules - Inventory module (Completes Task 4, 5, 6)
+
+**Files Created:**
+- `server/src/inventory/inventory.service.ts` - Store stats aggregation service with SQL aggregate queries
+- `server/src/inventory/inventory.controller.ts` - REST controller for store stats endpoint
+- `server/src/inventory/inventory.module.ts` - NestJS module definition
+
+**Files Modified:**
+- `server/src/app.module.ts` - Added InventoryModule import
+
+**API Endpoints Added:**
+- GET /api/v1/stores/:id/stats - Get store inventory statistics with optional lowStockThreshold query param
+
+**Features Implemented:**
+- Store statistics aggregation endpoint returning:
+  - storeId, storeName
+  - totalProducts (count of products)
+  - totalQuantity (sum of all product quantities)
+  - totalInventoryValue (sum of price * quantity)
+  - outOfStockCount (products with quantity = 0)
+  - lowStockCount (products with 0 < quantity <= threshold, default 5)
+  - categoryBreakdown (per-category stats: productCount, totalQuantity, totalValue)
+- Configurable low stock threshold via query parameter
+- Store existence validation
+- SQL aggregation queries using Drizzle ORM
+
+**Verification:**
+- TypeScript build passes successfully
+- No type errors
+
+**Next Steps:**
+- Create seed service to populate initial data on startup (Task 7)

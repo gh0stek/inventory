@@ -382,9 +382,9 @@ const result = await db
 1. ~~**Project Setup**: Initialize NestJS project, Docker compose with Postgres + Redis~~ **DONE**
 2. ~~**Database Setup**: Configure Drizzle ORM with PostgreSQL, create schema.ts with tables~~ **DONE**
 3. ~~**Drizzle Integration**: Create database module/provider for NestJS dependency injection~~ **DONE**
-4. **Backend Modules**: Create stores, products, inventory modules with controllers/services **IN PROGRESS - Stores & Products modules DONE**
-5. **Zod Validation**: Create Zod schemas with nestjs-zod DTOs, configure global validation pipe
-6. **Backend Features**: Filtering, pagination (Drizzle queries), aggregation endpoints
+4. ~~**Backend Modules**: Create stores, products, inventory modules with controllers/services~~ **DONE**
+5. ~~**Zod Validation**: Create Zod schemas with nestjs-zod DTOs, configure global validation pipe~~ **DONE** (implemented in modules)
+6. ~~**Backend Features**: Filtering, pagination (Drizzle queries), aggregation endpoints~~ **DONE**
 7. **Seed Data**: Create seed service to populate initial data on startup
 8. **Frontend Core**: Vite + React setup, Router, TanStack Query, Store List page
 9. **Frontend Features**: Store Detail page, filters, forms with Zod validation
