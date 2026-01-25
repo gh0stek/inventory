@@ -3,9 +3,10 @@ import { APP_PIPE } from '@nestjs/core';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { DatabaseModule } from './database/database.module';
 import { StoresModule } from './stores/stores.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
-  imports: [DatabaseModule, StoresModule],
+  imports: [DatabaseModule, StoresModule, ProductsModule],
   controllers: [],
   providers: [
     {
