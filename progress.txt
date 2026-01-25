@@ -321,3 +321,57 @@
 
 **Next Steps:**
 - Docker & Tests: Finalize Dockerfiles, write Jest tests for backend (Task 11)
+
+---
+
+### 2026-01-25: Docker & Tests Implementation
+
+**Task Completed:** Docker & Tests - Finalize Dockerfiles, write Jest tests for backend (Task 11)
+
+**Files Created:**
+- `web/Dockerfile` - Multi-stage Docker build for frontend (node builder + nginx runner)
+- `web/nginx.conf` - Nginx configuration with API proxy, SPA routing, and static asset caching
+- `server/jest.config.js` - Jest configuration for TypeScript tests
+- `server/src/stores/stores.service.spec.ts` - Unit tests for StoresService (12 tests)
+- `server/src/products/products.service.spec.ts` - Unit tests for ProductsService (16 tests)
+- `server/src/inventory/inventory.service.spec.ts` - Unit tests for InventoryService (10 tests)
+
+**Files Modified:**
+- `docker-compose.yml` - Added backend and frontend services with health checks and dependencies
+
+**Features Implemented:**
+- Complete Docker setup for full-stack deployment:
+  - Backend service with health check (wget to /health endpoint)
+  - Frontend service with nginx serving static files and proxying API requests
+  - Service dependencies ensuring proper startup order
+  - Health check conditions for postgres, redis, backend
+- Web Dockerfile:
+  - Multi-stage build (node:20-alpine builder, nginx:alpine runner)
+  - Copies built dist to nginx html directory
+  - Custom nginx config for SPA routing
+- Nginx configuration:
+  - Gzip compression for text assets
+  - API proxy to backend service
+  - SPA fallback routing (try_files -> index.html)
+  - Static asset caching (1 year for js/css/images)
+- Jest test suite for backend services:
+  - StoresService tests: findAll, findOne, create, update, remove
+  - ProductsService tests: findByStore (with filters), findOne, create, update, updateStock, remove
+  - InventoryService tests: getStoreStats with various scenarios
+  - All tests use mocked Drizzle database
+  - Tests cover success cases, error handling (NotFoundException, ConflictException)
+
+**Test Coverage:**
+- 38 tests total, all passing
+- StoresService: 12 tests (CRUD operations, error handling)
+- ProductsService: 16 tests (CRUD, filtering, pagination, error handling)
+- InventoryService: 10 tests (aggregation stats, edge cases)
+
+**Verification:**
+- TypeScript build passes successfully (server)
+- TypeScript build passes successfully (web)
+- Vite production build succeeds
+- All 38 Jest tests pass
+
+**Next Steps:**
+- Documentation: README with decisions and trade-offs (Task 12)

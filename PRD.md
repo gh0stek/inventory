@@ -389,7 +389,7 @@ const result = await db
 8. ~~**Frontend Core**: Vite + React setup, Router, TanStack Query, Store List page~~ **DONE**
 9. ~~**Frontend Features**: Store Detail page, filters, forms with Zod validation~~ **DONE**
 10. ~~**Polish**: Loading states, error handling, validation feedback~~ **DONE**
-11. **Docker & Tests**: Finalize Dockerfiles, write Jest tests for backend
+11. ~~**Docker & Tests**: Finalize Dockerfiles, write Jest tests for backend~~ **DONE**
 12. **Documentation**: README with decisions and trade-offs
 
 ---
