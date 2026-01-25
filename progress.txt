@@ -1,0 +1,35 @@
+## Progress Log
+
+### 2026-01-25: Stores Module Implementation
+
+**Task Completed:** Backend Modules - Stores module (Part of Task 4)
+
+**Files Created:**
+- `server/src/stores/schemas/store.schema.ts` - Zod validation schemas for CreateStoreDto and UpdateStoreDto
+- `server/src/stores/stores.service.ts` - Store CRUD service with Drizzle ORM queries
+- `server/src/stores/stores.controller.ts` - REST controller with GET/POST/PUT/DELETE endpoints
+- `server/src/stores/stores.module.ts` - NestJS module definition
+
+**Files Modified:**
+- `server/src/app.module.ts` - Added StoresModule import
+
+**API Endpoints Added:**
+- GET /api/v1/stores - List all stores
+- GET /api/v1/stores/:id - Get store by ID
+- POST /api/v1/stores - Create a new store
+- PUT /api/v1/stores/:id - Update a store
+- DELETE /api/v1/stores/:id - Delete a store (cascades to products)
+
+**Features Implemented:**
+- Full CRUD operations for stores
+- Zod validation with nestjs-zod integration
+- Error handling (NotFoundException, ConflictException for unique constraint)
+- TypeScript types inferred from Drizzle schema
+
+**Verification:**
+- TypeScript build passes successfully
+- No type errors
+
+**Next Steps:**
+- Create products module
+- Create inventory module with aggregation stats
