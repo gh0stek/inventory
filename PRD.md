@@ -386,7 +386,7 @@ const result = await db
 5. ~~**Zod Validation**: Create Zod schemas with nestjs-zod DTOs, configure global validation pipe~~ **DONE** (implemented in modules)
 6. ~~**Backend Features**: Filtering, pagination (Drizzle queries), aggregation endpoints~~ **DONE**
 7. ~~**Seed Data**: Create seed service to populate initial data on startup~~ **DONE**
-8. **Frontend Core**: Vite + React setup, Router, TanStack Query, Store List page
+8. ~~**Frontend Core**: Vite + React setup, Router, TanStack Query, Store List page~~ **DONE**
 9. **Frontend Features**: Store Detail page, filters, forms with Zod validation
 10. **Polish**: Loading states, error handling, validation feedback
 11. **Docker & Tests**: Finalize Dockerfiles, write Jest tests for backend

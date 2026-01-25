@@ -143,3 +143,60 @@
 
 **Next Steps:**
 - Create frontend core: Vite + React setup, Router, TanStack Query, Store List page (Task 8)
+
+---
+
+### 2026-01-25: Frontend Core Implementation
+
+**Task Completed:** Frontend Core - Vite + React setup, Router, TanStack Query, Store List page (Task 8)
+
+**Files Created:**
+- `web/` - New Vite + React + TypeScript project
+- `web/src/types/index.ts` - TypeScript interfaces for Store, Product, StoreStats, API responses
+- `web/src/api/client.ts` - Axios API client with stores endpoints
+- `web/src/hooks/useStores.ts` - TanStack Query hooks for stores (useStores, useStore, useStoreStats, mutations)
+- `web/src/components/common/LoadingSpinner.tsx` - Loading spinner component
+- `web/src/components/common/ErrorMessage.tsx` - Error message component
+- `web/src/components/common/index.ts` - Common components barrel export
+- `web/src/components/stores/StoreCard.tsx` - Store card component with stats display
+- `web/src/components/stores/index.ts` - Store components barrel export
+- `web/src/pages/StoreListPage.tsx` - Store list page with grid layout
+- `web/src/pages/StoreDetailPage.tsx` - Store detail page with stats dashboard (placeholder for products)
+- `web/src/pages/index.ts` - Pages barrel export
+
+**Files Modified:**
+- `web/vite.config.ts` - Added Tailwind CSS plugin and API proxy configuration
+- `web/src/index.css` - Replaced with Tailwind CSS imports
+- `web/src/App.tsx` - Added React Router and TanStack Query providers with routes
+
+**Files Deleted:**
+- `web/src/App.css` - Removed unused default styles
+
+**Dependencies Installed:**
+- react-router-dom - Client-side routing
+- @tanstack/react-query - Data fetching and caching
+- axios - HTTP client
+- tailwindcss, @tailwindcss/vite - Utility-first CSS framework
+
+**Features Implemented:**
+- Vite + React + TypeScript project setup
+- Tailwind CSS integration with Vite plugin
+- React Router with routes: `/stores` (list), `/stores/:id` (detail)
+- TanStack Query for data fetching with 5-minute stale time
+- API client with proxy to backend at localhost:8080
+- Store List page with:
+  - Grid layout of store cards
+  - Loading and error states
+  - Empty state message
+  - Stats displayed on each card (product count, inventory value)
+- Store Detail page with:
+  - Store info header
+  - Stats dashboard (total products, quantity, value, out of stock)
+  - Placeholder for product table
+
+**Verification:**
+- TypeScript build passes successfully
+- Vite production build succeeds
+
+**Next Steps:**
+- Create frontend features: Store Detail page with filters, forms, product table (Task 9)
