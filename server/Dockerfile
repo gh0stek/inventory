@@ -12,7 +12,7 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/dist ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 
@@ -21,4 +21,4 @@ ENV PORT=8080
 
 EXPOSE 8080
 
-CMD ["node", "dist/main.js"]
+CMD ["node", "src/main.js"]
