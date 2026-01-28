@@ -3,16 +3,28 @@ import {
   Inject,
   NotFoundException,
   ConflictException,
-} from '@nestjs/common';
-import { eq, and, gte, lte, gt, ilike, or, asc, desc, sql, SQL } from 'drizzle-orm';
-import { DRIZZLE, DrizzleDB } from '../database/database.provider';
-import { products, Product, NewProduct, stores } from '../database/schema';
+} from "@nestjs/common";
+import {
+  eq,
+  and,
+  gte,
+  lte,
+  gt,
+  ilike,
+  or,
+  asc,
+  desc,
+  sql,
+  SQL,
+} from "drizzle-orm";
+import { DRIZZLE, DrizzleProvider } from "../database/database.provider";
+import { products, Product, NewProduct, stores } from "../database/schema";
 import {
   CreateProductDto,
   UpdateProductDto,
   UpdateStockDto,
   ProductFilters,
-} from './schemas/product.schema';
+} from "./schemas/product.schema";
 
 export interface PaginatedProducts {
   data: Product[];
@@ -26,14 +38,14 @@ export interface PaginatedProducts {
 
 @Injectable()
 export class ProductsService {
-  constructor(@Inject(DRIZZLE) private db: DrizzleDB) {}
+  constructor(@Inject(DRIZZLE) private dbProvider: DrizzleProvider) {}
 
   async findByStore(
     storeId: number,
     filters: ProductFilters,
   ): Promise<PaginatedProducts> {
     // Verify store exists
-    const storeResult = await this.db
+    const storeResult = await this.dbProvider.db
       .select()
       .from(stores)
       .where(eq(stores.id, storeId));
@@ -77,7 +89,7 @@ export class ProductsService {
     const whereClause = and(...conditions);
 
     // Get total count
-    const countResult = await this.db
+    const countResult = await this.dbProvider.db
       .select({ count: sql<number>`count(*)::int` })
       .from(products)
       .where(whereClause);
@@ -92,11 +104,11 @@ export class ProductsService {
     }[filters.sortBy];
 
     const orderBy =
-      filters.sortOrder === 'asc' ? asc(sortColumn) : desc(sortColumn);
+      filters.sortOrder === "asc" ? asc(sortColumn) : desc(sortColumn);
 
     // Get paginated data
     const offset = (filters.page - 1) * filters.limit;
-    const data = await this.db
+    const data = await this.dbProvider.db
       .select()
       .from(products)
       .where(whereClause)
@@ -116,7 +128,7 @@ export class ProductsService {
   }
 
   async findOne(id: number): Promise<Product> {
-    const result = await this.db
+    const result = await this.dbProvider.db
       .select()
       .from(products)
       .where(eq(products.id, id));
@@ -128,9 +140,12 @@ export class ProductsService {
     return result[0];
   }
 
-  async create(storeId: number, createProductDto: CreateProductDto): Promise<Product> {
+  async create(
+    storeId: number,
+    createProductDto: CreateProductDto,
+  ): Promise<Product> {
     // Verify store exists
-    const storeResult = await this.db
+    const storeResult = await this.dbProvider.db
       .select()
       .from(stores)
       .where(eq(stores.id, storeId));
@@ -149,13 +164,13 @@ export class ProductsService {
     };
 
     try {
-      const result = await this.db
+      const result = await this.dbProvider.db
         .insert(products)
         .values(newProduct)
         .returning();
       return result[0];
     } catch (error: any) {
-      if (error.code === '23505') {
+      if (error.code === "23505") {
         throw new ConflictException(
           `Product with SKU "${createProductDto.sku}" already exists`,
         );
@@ -164,7 +179,10 @@ export class ProductsService {
     }
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto): Promise<Product> {
+  async update(
+    id: number,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
     await this.findOne(id);
 
     const updateData: Partial<NewProduct> = {
@@ -191,14 +209,14 @@ export class ProductsService {
     }
 
     try {
-      const result = await this.db
+      const result = await this.dbProvider.db
         .update(products)
         .set(updateData)
         .where(eq(products.id, id))
         .returning();
       return result[0];
     } catch (error: any) {
-      if (error.code === '23505') {
+      if (error.code === "23505") {
         throw new ConflictException(
           `Product with SKU "${updateProductDto.sku}" already exists`,
         );
@@ -207,10 +225,13 @@ export class ProductsService {
     }
   }
 
-  async updateStock(id: number, updateStockDto: UpdateStockDto): Promise<Product> {
+  async updateStock(
+    id: number,
+    updateStockDto: UpdateStockDto,
+  ): Promise<Product> {
     await this.findOne(id);
 
-    const result = await this.db
+    const result = await this.dbProvider.db
       .update(products)
       .set({
         quantity: updateStockDto.quantity,
@@ -224,6 +245,6 @@ export class ProductsService {
 
   async remove(id: number): Promise<void> {
     await this.findOne(id);
-    await this.db.delete(products).where(eq(products.id, id));
+    await this.dbProvider.db.delete(products).where(eq(products.id, id));
   }
 }

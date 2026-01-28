@@ -1,7 +1,7 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import { eq, sql, count, sum } from 'drizzle-orm';
-import { DRIZZLE, DrizzleDB } from '../database/database.provider';
-import { stores, products } from '../database/schema';
+import { Injectable, Inject, NotFoundException } from "@nestjs/common";
+import { eq, sql, count, sum } from "drizzle-orm";
+import { DRIZZLE, DrizzleProvider } from "../database/database.provider";
+import { stores, products } from "../database/schema";
 
 export interface CategoryBreakdown {
   category: string;
@@ -23,11 +23,14 @@ export interface StoreStats {
 
 @Injectable()
 export class InventoryService {
-  constructor(@Inject(DRIZZLE) private db: DrizzleDB) {}
+  constructor(@Inject(DRIZZLE) private dbProvider: DrizzleProvider) {}
 
-  async getStoreStats(storeId: number, lowStockThreshold: number = 5): Promise<StoreStats> {
+  async getStoreStats(
+    storeId: number,
+    lowStockThreshold: number = 5,
+  ): Promise<StoreStats> {
     // Verify store exists
-    const storeResult = await this.db
+    const storeResult = await this.dbProvider.db
       .select()
       .from(stores)
       .where(eq(stores.id, storeId));
@@ -39,7 +42,7 @@ export class InventoryService {
     const store = storeResult[0];
 
     // Get overall stats
-    const overallStats = await this.db
+    const overallStats = await this.dbProvider.db
       .select({
         totalProducts: count(),
         totalQuantity: sum(products.quantity),
@@ -49,13 +52,15 @@ export class InventoryService {
       .where(eq(products.storeId, storeId));
 
     // Get out of stock count
-    const outOfStockResult = await this.db
+    const outOfStockResult = await this.dbProvider.db
       .select({ count: count() })
       .from(products)
-      .where(sql`${products.storeId} = ${storeId} AND ${products.quantity} = 0`);
+      .where(
+        sql`${products.storeId} = ${storeId} AND ${products.quantity} = 0`,
+      );
 
     // Get low stock count (quantity > 0 AND quantity <= threshold)
-    const lowStockResult = await this.db
+    const lowStockResult = await this.dbProvider.db
       .select({ count: count() })
       .from(products)
       .where(
@@ -63,7 +68,7 @@ export class InventoryService {
       );
 
     // Get category breakdown
-    const categoryStats = await this.db
+    const categoryStats = await this.dbProvider.db
       .select({
         category: products.category,
         productCount: count(),

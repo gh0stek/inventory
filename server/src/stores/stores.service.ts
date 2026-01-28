@@ -1,12 +1,17 @@
-import { Injectable, Inject, NotFoundException, ConflictException } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
-import { DRIZZLE, DrizzleDB } from '../database/database.provider';
-import { stores, Store, NewStore } from '../database/schema';
-import { CreateStoreDto, UpdateStoreDto } from './schemas/store.schema';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  ConflictException,
+} from "@nestjs/common";
+import { eq } from "drizzle-orm";
+import { DRIZZLE, DrizzleProvider } from "../database/database.provider";
+import { stores, Store, NewStore } from "../database/schema";
+import { CreateStoreDto, UpdateStoreDto } from "./schemas/store.schema";
 
 @Injectable()
 export class StoresService {
-  constructor(@Inject(DRIZZLE) private db: DrizzleDB) {}
+  constructor(@Inject(DRIZZLE) private db: DrizzleProvider) {}
 
   async findAll(): Promise<Store[]> {
     return this.db.select().from(stores);
@@ -33,8 +38,10 @@ export class StoresService {
       const result = await this.db.insert(stores).values(newStore).returning();
       return result[0];
     } catch (error: any) {
-      if (error.code === '23505') {
-        throw new ConflictException(`Store with name "${createStoreDto.name}" already exists`);
+      if (error.code === "23505") {
+        throw new ConflictException(
+          `Store with name "${createStoreDto.name}" already exists`,
+        );
       }
       throw error;
     }
@@ -65,8 +72,10 @@ export class StoresService {
         .returning();
       return result[0];
     } catch (error: any) {
-      if (error.code === '23505') {
-        throw new ConflictException(`Store with name "${updateStoreDto.name}" already exists`);
+      if (error.code === "23505") {
+        throw new ConflictException(
+          `Store with name "${updateStoreDto.name}" already exists`,
+        );
       }
       throw error;
     }
