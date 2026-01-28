@@ -5,8 +5,12 @@ import {
   ConflictException,
 } from "@nestjs/common";
 import { eq } from "drizzle-orm";
-import { DRIZZLE, DrizzleProvider } from "../database/database.provider";
-import { stores, Store, NewStore } from "../database/schema";
+import {
+  DRIZZLE,
+  DrizzleProvider,
+  Transactional,
+} from "../database/database.provider";
+import { stores, Store, NewStore, products } from "../database/schema";
 import { CreateStoreDto, UpdateStoreDto } from "./schemas/store.schema";
 
 @Injectable()
@@ -87,8 +91,10 @@ export class StoresService {
     }
   }
 
+  @Transactional()
   async remove(id: number): Promise<void> {
     await this.findOne(id);
+    await this.dbProvider.db.delete(products).where(eq(products.storeId, id));
     await this.dbProvider.db.delete(stores).where(eq(stores.id, id));
   }
 }

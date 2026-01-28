@@ -8,6 +8,13 @@
       "when": 1769596975240,
       "tag": "0000_early_dagger",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769630214090,
+      "tag": "0001_condemned_joseph",
+      "breakpoints": true
     }
   ]
 }

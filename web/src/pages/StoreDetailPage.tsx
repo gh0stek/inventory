@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
-import { useParams, Link } from "react-router-dom";
-import { useStore, useStoreStats } from "../hooks/useStores";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useStore, useStoreStats, useDeleteStore } from "../hooks/useStores";
 import {
   useProducts,
   useCreateProduct,
@@ -28,12 +28,14 @@ import { useToast } from "../hooks/useToast";
 export function StoreDetailPage() {
   const { id } = useParams<{ id: string }>();
   const storeId = Number(id);
+  const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
 
   const [filters, setFilters] = useState<Filters>({ page: 1, limit: 20 });
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
+  const [showDeleteStoreConfirm, setShowDeleteStoreConfirm] = useState(false);
   const [formServerErrors, setFormServerErrors] = useState<
     Record<string, string>
   >({});
@@ -65,6 +67,7 @@ export function StoreDetailPage() {
   const updateProduct = useUpdateProduct(storeId);
   const updateStock = useUpdateProductStock(storeId);
   const deleteProduct = useDeleteProduct(storeId);
+  const deleteStore = useDeleteStore();
 
   const categories = useMemo(() => {
     if (!stats?.categoryBreakdown) return [];
@@ -171,6 +174,19 @@ export function StoreDetailPage() {
     setDeletingProduct(null);
   };
 
+  const handleDeleteStore = () => {
+    deleteStore.mutate(storeId, {
+      onSuccess: () => {
+        showSuccess("Store deleted successfully");
+        navigate("/stores");
+      },
+      onError: (error) => {
+        showError(getErrorMessage(error));
+        setShowDeleteStoreConfirm(false);
+      },
+    });
+  };
+
   if (isLoadingStore) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -207,11 +223,21 @@ export function StoreDetailPage() {
         </Link>
 
         <div className="bg-white rounded-lg shadow border border-gray-200 p-6 mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {store.name}
-          </h1>
-          {store.address && <p className="text-gray-600">{store.address}</p>}
-          {store.phone && <p className="text-gray-600">{store.phone}</p>}
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                {store.name}
+              </h1>
+              {store.address && <p className="text-gray-600">{store.address}</p>}
+              {store.phone && <p className="text-gray-600">{store.phone}</p>}
+            </div>
+            <button
+              onClick={() => setShowDeleteStoreConfirm(true)}
+              className="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-md hover:bg-red-50"
+            >
+              Remove Store
+            </button>
+          </div>
         </div>
 
         {isLoadingStats ? (
@@ -331,6 +357,36 @@ export function StoreDetailPage() {
           onCancel={handleDeleteCancel}
           isLoading={deleteProduct.isPending}
         />
+      )}
+
+      {showDeleteStoreConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">
+              Remove Store
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to remove "{store.name}"? This will also
+              delete all products in this store. This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowDeleteStoreConfirm(false)}
+                disabled={deleteStore.isPending}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteStore}
+                disabled={deleteStore.isPending}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 disabled:opacity-50"
+              >
+                {deleteStore.isPending ? "Removing..." : "Remove"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -24,7 +24,7 @@ export const products = pgTable("products", {
   id: serial("id").primaryKey(),
   storeId: integer("store_id")
     .notNull()
-    .references(() => stores.id, { onDelete: "cascade" }),
+    .references(() => stores.id, { onDelete: "no action" }),
   name: text("name").notNull(),
   category: text("category").notNull(),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
