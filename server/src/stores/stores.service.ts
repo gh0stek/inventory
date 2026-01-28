@@ -12,10 +12,12 @@ import {
 } from "../database/database.provider";
 import { stores, Store, NewStore, products } from "../database/schema";
 import { CreateStoreDto, UpdateStoreDto } from "./schemas/store.schema";
+import { ProductsService } from "src/products/products.service";
 
 @Injectable()
 export class StoresService {
   constructor(@Inject(DRIZZLE) private dbProvider: DrizzleProvider) {}
+  @Inject(ProductsService) private productsService: ProductsService;
 
   async findAll(): Promise<Store[]> {
     return this.dbProvider.db.select().from(stores);
@@ -94,7 +96,7 @@ export class StoresService {
   @Transactional()
   async remove(id: number): Promise<void> {
     await this.findOne(id);
-    await this.dbProvider.db.delete(products).where(eq(products.storeId, id));
+    await this.productsService.removeAllInStore(id);
     await this.dbProvider.db.delete(stores).where(eq(stores.id, id));
   }
 }

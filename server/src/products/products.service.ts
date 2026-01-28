@@ -247,4 +247,10 @@ export class ProductsService {
     await this.findOne(id);
     await this.dbProvider.db.delete(products).where(eq(products.id, id));
   }
+
+  async removeAllInStore(storeId: number): Promise<void> {
+    await this.dbProvider.db
+      .delete(products)
+      .where(eq(products.storeId, storeId));
+  }
 }
