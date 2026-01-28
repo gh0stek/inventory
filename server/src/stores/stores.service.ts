@@ -11,14 +11,17 @@ import { CreateStoreDto, UpdateStoreDto } from "./schemas/store.schema";
 
 @Injectable()
 export class StoresService {
-  constructor(@Inject(DRIZZLE) private db: DrizzleProvider) {}
+  constructor(@Inject(DRIZZLE) private dbProvider: DrizzleProvider) {}
 
   async findAll(): Promise<Store[]> {
-    return this.db.select().from(stores);
+    return this.dbProvider.db.select().from(stores);
   }
 
   async findOne(id: number): Promise<Store> {
-    const result = await this.db.select().from(stores).where(eq(stores.id, id));
+    const result = await this.dbProvider.db
+      .select()
+      .from(stores)
+      .where(eq(stores.id, id));
 
     if (result.length === 0) {
       throw new NotFoundException(`Store with ID ${id} not found`);
@@ -35,7 +38,10 @@ export class StoresService {
     };
 
     try {
-      const result = await this.db.insert(stores).values(newStore).returning();
+      const result = await this.dbProvider.db
+        .insert(stores)
+        .values(newStore)
+        .returning();
       return result[0];
     } catch (error: any) {
       if (error.code === "23505") {
@@ -65,7 +71,7 @@ export class StoresService {
     }
 
     try {
-      const result = await this.db
+      const result = await this.dbProvider.db
         .update(stores)
         .set(updateData)
         .where(eq(stores.id, id))
@@ -83,6 +89,6 @@ export class StoresService {
 
   async remove(id: number): Promise<void> {
     await this.findOne(id);
-    await this.db.delete(stores).where(eq(stores.id, id));
+    await this.dbProvider.db.delete(stores).where(eq(stores.id, id));
   }
 }

@@ -1,7 +1,7 @@
 import { z } from "zod";
 import * as dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({ path: "../.env" });
 
 export const DATABASE_URL = z
   .string()

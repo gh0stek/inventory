@@ -1,14 +1,14 @@
-import { useState, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { useStore, useStoreStats } from '../hooks/useStores';
+import { useState, useMemo } from "react";
+import { useParams, Link } from "react-router-dom";
+import { useStore, useStoreStats } from "../hooks/useStores";
 import {
   useProducts,
   useCreateProduct,
   useUpdateProduct,
   useUpdateProductStock,
   useDeleteProduct,
-} from '../hooks/useProducts';
-import { LoadingSpinner, ErrorMessage } from '../components/common';
+} from "../hooks/useProducts";
+import { LoadingSpinner, ErrorMessage } from "../components/common";
 import {
   ProductFilters,
   ProductTable,
@@ -16,10 +16,14 @@ import {
   ProductForm,
   Pagination,
   DeleteConfirmation,
-} from '../components/products';
-import { useToast } from '../context/ToastContext';
-import { getErrorMessage, getValidationErrors } from '../utils/errors';
-import type { Product, ProductFilters as Filters, CreateProductData } from '../types';
+} from "../components/products";
+import { getErrorMessage, getValidationErrors } from "../utils/errors";
+import type {
+  Product,
+  ProductFilters as Filters,
+  CreateProductData,
+} from "../types";
+import { useToast } from "../hooks/useToast";
 
 export function StoreDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -30,12 +34,32 @@ export function StoreDetailPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
-  const [formServerErrors, setFormServerErrors] = useState<Record<string, string>>({});
-  const [stockUpdateError, setStockUpdateError] = useState<{ id: number; message: string } | null>(null);
+  const [formServerErrors, setFormServerErrors] = useState<
+    Record<string, string>
+  >({});
+  const [stockUpdateError, setStockUpdateError] = useState<{
+    id: number;
+    message: string;
+  } | null>(null);
 
-  const { data: store, isLoading: isLoadingStore, error: storeError, refetch: refetchStore } = useStore(storeId);
-  const { data: stats, isLoading: isLoadingStats, error: statsError, refetch: refetchStats } = useStoreStats(storeId);
-  const { data: productsResponse, isLoading: isLoadingProducts, error: productsError, refetch: refetchProducts } = useProducts(storeId, filters);
+  const {
+    data: store,
+    isLoading: isLoadingStore,
+    error: storeError,
+    refetch: refetchStore,
+  } = useStore(storeId);
+  const {
+    data: stats,
+    isLoading: isLoadingStats,
+    error: statsError,
+    refetch: refetchStats,
+  } = useStoreStats(storeId);
+  const {
+    data: productsResponse,
+    isLoading: isLoadingProducts,
+    error: productsError,
+    refetch: refetchProducts,
+  } = useProducts(storeId, filters);
 
   const createProduct = useCreateProduct(storeId);
   const updateProduct = useUpdateProduct(storeId);
@@ -44,8 +68,8 @@ export function StoreDetailPage() {
 
   const categories = useMemo(() => {
     if (!stats?.categoryBreakdown) return [];
-    return stats.categoryBreakdown.map((c) => c.category).sort();
-  }, [stats?.categoryBreakdown]);
+    return [...stats.categoryBreakdown.map((c) => c.category)].sort();
+  }, [stats]);
 
   const handleFiltersChange = (newFilters: Filters) => {
     setFilters(newFilters);
@@ -75,14 +99,14 @@ export function StoreDetailPage() {
       { id: product.id, quantity },
       {
         onSuccess: () => {
-          showSuccess('Stock updated successfully');
+          showSuccess("Stock updated successfully");
         },
         onError: (error) => {
           const message = getErrorMessage(error);
           setStockUpdateError({ id: product.id, message });
           showError(message);
         },
-      }
+      },
     );
   };
 
@@ -95,7 +119,7 @@ export function StoreDetailPage() {
           onSuccess: () => {
             setShowForm(false);
             setEditingProduct(null);
-            showSuccess('Product updated successfully');
+            showSuccess("Product updated successfully");
           },
           onError: (error) => {
             const validationErrors = getValidationErrors(error);
@@ -104,13 +128,13 @@ export function StoreDetailPage() {
             }
             showError(getErrorMessage(error));
           },
-        }
+        },
       );
     } else {
       createProduct.mutate(data, {
         onSuccess: () => {
           setShowForm(false);
-          showSuccess('Product created successfully');
+          showSuccess("Product created successfully");
         },
         onError: (error) => {
           const validationErrors = getValidationErrors(error);
@@ -134,7 +158,7 @@ export function StoreDetailPage() {
       deleteProduct.mutate(deletingProduct.id, {
         onSuccess: () => {
           setDeletingProduct(null);
-          showSuccess('Product deleted successfully');
+          showSuccess("Product deleted successfully");
         },
         onError: (error) => {
           showError(getErrorMessage(error));
@@ -162,7 +186,10 @@ export function StoreDetailPage() {
           message="Failed to load store. Please try again later."
           onRetry={() => refetchStore()}
         />
-        <Link to="/stores" className="text-blue-600 hover:underline mt-4 inline-block">
+        <Link
+          to="/stores"
+          className="text-blue-600 hover:underline mt-4 inline-block"
+        >
           Back to stores
         </Link>
       </div>
@@ -172,12 +199,17 @@ export function StoreDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link to="/stores" className="text-blue-600 hover:underline mb-4 inline-block">
+        <Link
+          to="/stores"
+          className="text-blue-600 hover:underline mb-4 inline-block"
+        >
           &larr; Back to stores
         </Link>
 
         <div className="bg-white rounded-lg shadow border border-gray-200 p-6 mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">{store.name}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            {store.name}
+          </h1>
           {store.address && <p className="text-gray-600">{store.address}</p>}
           {store.phone && <p className="text-gray-600">{store.phone}</p>}
         </div>
@@ -185,7 +217,10 @@ export function StoreDetailPage() {
         {isLoadingStats ? (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-white rounded-lg shadow border border-gray-200 p-4 animate-pulse">
+              <div
+                key={i}
+                className="bg-white rounded-lg shadow border border-gray-200 p-4 animate-pulse"
+              >
                 <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
                 <div className="h-8 bg-gray-200 rounded w-16"></div>
               </div>
@@ -202,19 +237,27 @@ export function StoreDetailPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
               <p className="text-sm text-gray-500">Total Products</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalProducts}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {stats.totalProducts}
+              </p>
             </div>
             <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
               <p className="text-sm text-gray-500">Total Quantity</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalQuantity}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {stats.totalQuantity}
+              </p>
             </div>
             <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
               <p className="text-sm text-gray-500">Inventory Value</p>
-              <p className="text-2xl font-bold text-green-600">${stats.totalInventoryValue.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-green-600">
+                ${stats.totalInventoryValue.toFixed(2)}
+              </p>
             </div>
             <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
               <p className="text-sm text-gray-500">Out of Stock</p>
-              <p className="text-2xl font-bold text-red-600">{stats.outOfStockCount}</p>
+              <p className="text-2xl font-bold text-red-600">
+                {stats.outOfStockCount}
+              </p>
             </div>
           </div>
         ) : null}
@@ -251,7 +294,11 @@ export function StoreDetailPage() {
                   onEdit={handleEditProduct}
                   onDelete={handleDeleteProduct}
                   onStockUpdate={handleStockUpdate}
-                  stockUpdatingId={updateStock.isPending ? updateStock.variables?.id : undefined}
+                  stockUpdatingId={
+                    updateStock.isPending
+                      ? updateStock.variables?.id
+                      : undefined
+                  }
                   stockUpdateError={stockUpdateError}
                 />
                 <Pagination
