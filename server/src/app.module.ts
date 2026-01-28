@@ -5,10 +5,11 @@ import { DatabaseModule } from './database/database.module';
 import { StoresModule } from './stores/stores.module';
 import { ProductsModule } from './products/products.module';
 import { InventoryModule } from './inventory/inventory.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [DatabaseModule, StoresModule, ProductsModule, InventoryModule],
-  controllers: [],
+  controllers: [HealthController],
   providers: [
     {
       provide: APP_PIPE,
