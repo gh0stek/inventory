@@ -16,7 +16,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "dotenv npx tsx src/database/seed.ts"
+    "db:seed": "dotenv npx tsx src/database/seed.ts",
+    "db:mgrate:seed": "npm run db:migrate && npm run db:seed"
   },
   "dependencies": {
     "@nestjs/common": "~11.1.12",

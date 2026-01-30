@@ -25,6 +25,16 @@ services:
       timeout: 5s
       retries: 5
 
+  migration:
+    build:
+      context: ./server
+      dockerfile: migration.Dockerfile
+    environment:
+      DATABASE_URL: postgres://inventory:inventory_secret@postgres:5432/inventory
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   backend:
     build: ./server
     ports:
